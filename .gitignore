@@ -1,0 +1,9 @@
+*.drc
+*.exe
+*.map
+bin/dunitx-results.txt
+*.local
+*.dcu
+*.identcache
+*.res
+*.stat

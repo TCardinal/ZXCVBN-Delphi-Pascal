@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{BBA01EF8-A74A-4391-8A3A-ADB0622CE0E1}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="gui-example\ZxcvbnDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="test\zxcvbn_test.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ZxcvbnDemo">
+        <MSBuild Projects="gui-example\ZxcvbnDemo.dproj"/>
+    </Target>
+    <Target Name="ZxcvbnDemo:Clean">
+        <MSBuild Projects="gui-example\ZxcvbnDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ZxcvbnDemo:Make">
+        <MSBuild Projects="gui-example\ZxcvbnDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="zxcvbn_test">
+        <MSBuild Projects="test\zxcvbn_test.dproj"/>
+    </Target>
+    <Target Name="zxcvbn_test:Clean">
+        <MSBuild Projects="test\zxcvbn_test.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="zxcvbn_test:Make">
+        <MSBuild Projects="test\zxcvbn_test.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ZxcvbnDemo;zxcvbn_test"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ZxcvbnDemo:Clean;zxcvbn_test:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ZxcvbnDemo:Make;zxcvbn_test:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

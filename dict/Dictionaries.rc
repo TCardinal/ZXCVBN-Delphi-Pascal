@@ -1,0 +1,5 @@
+ZxcvbnDictionaries_english RCDATA "english.lst"
+ZxcvbnDictionaries_female_names RCDATA "female_names.lst"
+ZxcvbnDictionaries_male_names RCDATA "male_names.lst"
+ZxcvbnDictionaries_passwords RCDATA "passwords.lst"
+ZxcvbnDictionaries_surnames RCDATA "surnames.lst"
