@@ -7,3 +7,5 @@ bin/dunitx-results.txt
 *.identcache
 *.res
 *.stat
+*.jdbg
+gui-example/ZxcvbnDemo_project.tvsconfig

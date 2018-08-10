@@ -33,8 +33,8 @@ implementation
 {$R *.dfm}
 {$R Dictionaries.res}
 
-uses Zxcvbn.Utility,
-     Zxcvbn.Result;
+uses
+  Zxcvbn.Result;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
@@ -90,11 +90,11 @@ begin
 
 	s := s+#13#10+#13#10+
 			'Warning: ' + #10 +
-			Zxcvbn.Utility.GetWarning(res.Warning);
+			res.WarningText;
 
 	s := s+#13#10+#13#10+
 			'Suggestions: ' + #10 +
-			Zxcvbn.Utility.GetSuggestions(res.Suggestions);
+			res.SuggestionsText;
 
 	labWarnings.Caption := s;
   finally

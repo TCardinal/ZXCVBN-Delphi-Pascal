@@ -108,6 +108,8 @@ begin
 {
 	Returns Integer from 0-4 (useful for implementing a strength bar)
 }
+	guesses := 0.5 * Power(2, Entropy);
+
 	if guesses < 10E3 then
 		Result := 0 // too guessable: risky password. (guesses < 10^3)
 	else if guesses < 10E6 then
