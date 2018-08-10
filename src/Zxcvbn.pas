@@ -36,7 +36,7 @@ type
     /// <param name="APassword">Password being evaluated</param>
     /// <param name="AMatches">List of matches found against the password</param>
     /// <returns>A result object for the lowest entropy match sequence</returns>
-    function FindMinimumEntropyMatch(APassword: String; AMatches: TList<TZxcvbnMatch>): TZxcvbnResult;
+	 function FindMinimumEntropyMatch(APassword: String; AMatches: TList<TZxcvbnMatch>): TZxcvbnResult;
 
     function GetLongestMatch(const AMatchSequence: TList<TZxcvbnMatch>): TZxcvbnMatch;
 
@@ -250,10 +250,10 @@ begin
   res.CrackTime_OfflineFastHashing := res.Guesses / 10E9;       // 10B guesses/sec
 
 //res.CrackTimeDisplay := Zxcvbn.Utility.DisplayTime(crackTime, FTranslation);
-  res.CrackTimeDisplay_OnlineThrottling   := Zxcvbn.Utility.DisplayTime(res.CrackTime_OnlineThrottling);
-  res.CrackTimeDisplay_OnlineNoThrottling := Zxcvbn.Utility.DisplayTime(res.CrackTime_OnlineNoThrottling);
-  res.CrackTimeDisplay_OfflineSlowHashing := Zxcvbn.Utility.DisplayTime(res.CrackTime_OfflineSlowHashing);
-  res.CrackTimeDisplay_OfflineFastHashing := Zxcvbn.Utility.DisplayTime(res.CrackTime_OfflineFastHashing);
+  res.CrackTimeDisplay_OnlineThrottling   := Zxcvbn.Utility.DisplayTime(res.CrackTime_OnlineThrottling, FTranslation);
+  res.CrackTimeDisplay_OnlineNoThrottling := Zxcvbn.Utility.DisplayTime(res.CrackTime_OnlineNoThrottling, FTranslation);
+  res.CrackTimeDisplay_OfflineSlowHashing := Zxcvbn.Utility.DisplayTime(res.CrackTime_OfflineSlowHashing, FTranslation);
+  res.CrackTimeDisplay_OfflineFastHashing := Zxcvbn.Utility.DisplayTime(res.CrackTime_OfflineFastHashing, FTranslation);
 
   res.Score := Zxcvbn.PasswordScoring.EntropyToScore(minEntropy);
 
@@ -281,6 +281,10 @@ begin
       end;
     end;
   end;
+
+  res.WarningText := GetWarning(res.Warning, FTranslation);
+  res.SuggestionsText := GetSuggestions(res.Suggestions, FTranslation);
+
   Result := res;
 end;
 

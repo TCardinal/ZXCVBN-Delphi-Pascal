@@ -274,10 +274,14 @@ type
 	 /// </summary>
 	 Warning: TZxcvbnWarning;
 
+	 WarningText: string;
+
 	 /// <summary>
 	 /// Suggestion on how to improve the password
 	 /// </summary>
 	 Suggestions: TZxcvbnSuggestions;
+
+    SuggestionsText: string;
 
 	 /// <summary>
 	 /// Constructor initialize Suggestion list.
