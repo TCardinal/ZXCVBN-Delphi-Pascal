@@ -70,15 +70,35 @@ end;
 procedure TMainForm.DoOnPasswordEditChange(ASender: TObject);
 var
   res: TZxcvbnResult;
+  s: string;
 begin
   res := FZxcvbn.EvaluatePassword(edPassword.Text);
   try
-    FPasswordScore := res.Score;
-    labWarnings.Caption := 'Warning: ' + #10 + Zxcvbn.Utility.GetWarning(res.Warning) + #10 +
-      'Suggestions: ' + #10 + Zxcvbn.Utility.GetSuggestions(res.Suggestions);
-    pbStrength.Invalidate;
+	 FPasswordScore := res.Score;
+	 pbStrength.Invalidate;
+
+	 s :=
+			'Guesses (Log10):     '+FloatToStrF(res.GuessesLog10, ffFixed, 15, 5)+#13#10+
+			'Score:               '+Format('%d / 4', [res.Score])+#13#10+
+			'Calculation runtime: '+IntToStr(res.CalcTime)+' ms'+#13#10+#13#10+
+
+			'Guess times: '+#13#10+
+			' • 100 / hour:   '+res.CrackTimeDisplay_OnlineThrottling+' (throttling online attack)'+#13#10+
+			' • 10  / second: '+res.CrackTimeDisplay_OnlineNoThrottling+' (unthrottled online attack)'+#13#10+
+			' • 10k / second: '+res.CrackTimeDisplay_OfflineSlowHashing+' (offline attack, slow hash, many cores)'+#13#10+
+			' • 100 / hour:   '+res.CrackTimeDisplay_OfflineFastHashing+' (offline attack, fast hash, many cores)';
+
+	s := s+#13#10+#13#10+
+			'Warning: ' + #10 +
+			Zxcvbn.Utility.GetWarning(res.Warning);
+
+	s := s+#13#10+#13#10+
+			'Suggestions: ' + #10 +
+			Zxcvbn.Utility.GetSuggestions(res.Suggestions);
+
+	labWarnings.Caption := s;
   finally
-    res.Free;
+	 res.Free;
   end;
 end;
 
