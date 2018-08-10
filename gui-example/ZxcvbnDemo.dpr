@@ -7,8 +7,6 @@ program ZxcvbnDemo;
 {$R 'Dictionaries.res' '..\dict\Dictionaries.rc'}
 
 uses
-  madExcept,
-  madLinkDisAsm,
   Vcl.Forms,
   ZxcvbnDemoForm in 'ZxcvbnDemoForm.pas' {MainForm},
   Zxcvbn.DateMatcher in '..\src\Zxcvbn.DateMatcher.pas',
