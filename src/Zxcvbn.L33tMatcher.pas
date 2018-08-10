@@ -291,7 +291,7 @@ end;
 procedure TZxcvbnL33tMatcher.MatchPassword(APassword: String; var AMatches: TList<TZxcvbnMatch>);
 var
   addMatch: TZxcvbnL33tMatch;
-  matches, sortedMatches: TList<TZxcvbnMatch>;
+  matches: TList<TZxcvbnMatch>;
   subs: TList<TDictionary<Char, Char>>;
   subDict: TDictionary<Char, Char>;
   sub_password: String;

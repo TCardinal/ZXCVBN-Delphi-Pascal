@@ -33,7 +33,7 @@ const
   /// </summary>
   /// <param name="crackTimeSeconds">Number of seconds estimated for password cracking</param>
   /// <returns>Password strength. 0 to 4, 0 is minimum</returns>
-  function CrackTimeToScore(ACrackTimeSeconds: Double): Integer;
+  function EntropyToScore(Entropy: Real): Integer;
 
   /// <summary>
   /// Caclulate binomial coefficient (i.e. nCk)
@@ -53,6 +53,7 @@ const
   function CalculateUppercaseEntropy(AWord: String): Double;
 
 implementation
+
 uses
   Winapi.Windows, System.Math;
 
@@ -100,13 +101,25 @@ begin
   Result := 0.5 * Power(2, AEntropy) * SecondsPerGuess;
 end;
 
-function CrackTimeToScore(ACrackTimeSeconds: Double): Integer;
+function EntropyToScore(Entropy: Real): Integer;
+var
+	guesses: Real;
 begin
-  if (ACrackTimeSeconds < Power(10, 2)) then Result := 0
-  else if (ACrackTimeSeconds < Power(10, 4)) then Result := 1
-  else if (ACrackTimeSeconds < Power(10, 6)) then Result := 2
-  else if (ACrackTimeSeconds < Power(10, 8)) then Result := 3
-  else Result := 4;
+{
+	Returns Integer from 0-4 (useful for implementing a strength bar)
+}
+	guesses := 0.5 * Power(2, Entropy);
+
+	if guesses < 10E3 then
+		Result := 0 // too guessable: risky password. (guesses < 10^3)
+	else if guesses < 10E6 then
+		Result := 1 // very guessable: protection from throttled online attacks. (guesses < 10^6)
+	else if guesses < 10E8 then
+		Result := 2 // somewhat guessable: protection from unthrottled online attacks. (guesses < 10^8)
+	else if guesses < 10E10 then
+		Result := 3 // safely unguessable: moderate protection from offline slow-hash scenario. (guesses < 10^10)
+	else
+		Result := 4; // very unguessable: strong protection from offline slow-hash scenario. (guesses >= 10^10)
 end;
 
 function Binomial(n, k: Integer): Integer;
