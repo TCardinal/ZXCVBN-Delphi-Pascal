@@ -242,9 +242,20 @@ begin
   res.Password := APassword;
   res.Entropy := minEntropy;
   res.MatchSequence := matchSequence;
-  res.CrackTime := crackTime;
-  res.CrackTimeDisplay := Zxcvbn.Utility.DisplayTime(crackTime, FTranslation);
-  res.Score := Zxcvbn.PasswordScoring.CrackTimeToScore(crackTime);
+
+//res.CrackTime := crackTime;
+  res.CrackTime_OnlineThrottling   := res.Guesses / 100*60*60;  // 100 guesses/hour
+  res.CrackTime_OnlineNoThrottling := res.Guesses / 100;        // 100 guesses/sec
+  res.CrackTime_OfflineSlowHashing := res.Guesses / 10000;      // 10k guesses/sec
+  res.CrackTime_OfflineFastHashing := res.Guesses / 10E9;       // 10B guesses/sec
+
+//res.CrackTimeDisplay := Zxcvbn.Utility.DisplayTime(crackTime, FTranslation);
+  res.CrackTimeDisplay_OnlineThrottling   := Zxcvbn.Utility.DisplayTime(res.CrackTime_OnlineThrottling);
+  res.CrackTimeDisplay_OnlineNoThrottling := Zxcvbn.Utility.DisplayTime(res.CrackTime_OnlineNoThrottling);
+  res.CrackTimeDisplay_OfflineSlowHashing := Zxcvbn.Utility.DisplayTime(res.CrackTime_OfflineSlowHashing);
+  res.CrackTimeDisplay_OfflineFastHashing := Zxcvbn.Utility.DisplayTime(res.CrackTime_OfflineFastHashing);
+
+  res.Score := Zxcvbn.PasswordScoring.EntropyToScore(minEntropy);
 
   //starting feedback
   res.Warning := zwDefault;
@@ -358,7 +369,7 @@ begin
         AResult.Warning := TZxcvbnWarning.zwTop100Passwords
       else
         AResult.Warning := TZxcvbnWarning.zwCommonPasswords;
-    end else if (Zxcvbn.PasswordScoring.CrackTimeToScore(Zxcvbn.PasswordScoring.EntropyToCrackTime(AMatch.Entropy)) <= 1) then
+    end else if (Zxcvbn.PasswordScoring.EntropyToScore(AMatch.Entropy) <= 1) then
     begin
       AResult.Warning := TZxcvbnWarning.zwSimilarCommonPasswords;
     end

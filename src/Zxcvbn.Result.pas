@@ -213,6 +213,9 @@ type
   /// The results of zxcvbn's password analysis
   /// </summary>
   TZxcvbnResult = class
+  private
+	 function get_Guesses: Real;
+    function get_GuessesLog10: Real;
   public
     /// <summary>
     /// A calculated estimate of how many bits of entropy the password covers, rounded to three decimal places.
@@ -222,61 +225,85 @@ type
     /// <summary>
     /// The number of milliseconds that zxcvbn took to calculate results for this password
     /// </summary>
-    CalcTime: NativeInt;
+	 CalcTime: NativeInt;
+
+	 /// <summary>
+	 /// A score from 0 to 4 (inclusive), with 0 being least secure and 4 being most secure calculated from crack time:
+	 /// [0,1,2,3,4] if crack time is less than [10**2, 10**4, 10**6, 10**8, Infinity] seconds.
+	 /// Useful for implementing a strength meter
+    /// </summary>
+	 Score: Integer;
 
     /// <summary>
     /// An estimation of the crack time for this password in seconds
     /// </summary>
-    CrackTime: Double;
+//	 CrackTime: Double;
+	 /// <summary>Time (seconds) to crack with an online attack on a service that ratelimits password auth attempts. (100 guesses/hour)</summary>
+	 CrackTime_OnlineThrottling: Double;
+	 /// <summary>Time (seconds) to crack with online attack on a service that doesn't ratelimit, or where an attacker has outsmarted ratelimiting. (100 guesses/sec)</summary>
+	 CrackTime_OnlineNoThrottling: Double;
+	 /// <summary>Time (seconds) to crack with an offline attack. assumes multiple attackers, proper user-unique salting, and a slow hash function with moderate work factor, such as bcrypt, scrypt, PBKDF2. (10,000 guesses/sec)</summary>
+	 CrackTime_OfflineSlowHashing: Double;
+	 /// <summary>Time (seconds) to crack with offline attack with user-unique salting but a fast hash function like SHA-1, SHA-256 or MD5. A wide range of reasonable numbers anywhere from one billion - one trillion guesses per second, depending on number of cores and machines. (10 billion gusses/sec)</summary>
+	 CrackTime_OfflineFastHashing: Double;
+
+//	res.CrackTimeDisplay := Zxcvbn.Utility.DisplayTime(crackTime, FTranslation);
+	CrackTimeDisplay_OnlineThrottling: string;
+	CrackTimeDisplay_OnlineNoThrottling: string;
+	CrackTimeDisplay_OfflineSlowHashing: string;
+	CrackTimeDisplay_OfflineFastHashing: string;
+
 
     /// <summary>
     /// A friendly string for the crack time (like "centuries", "instant", "7 minutes", "14 hours" etc.)
     /// </summary>
     CrackTimeDisplay: String;
 
-    /// <summary>
-    /// A score from 0 to 4 (inclusive), with 0 being least secure and 4 being most secure calculated from crack time:
-    /// [0,1,2,3,4] if crack time is less than [10**2, 10**4, 10**6, 10**8, Infinity] seconds.
-    /// Useful for implementing a strength meter
-    /// </summary>
-    Score: Integer;
-
-    /// <summary>
+	 /// <summary>
     /// The sequence of matches that were used to create the entropy calculation
     /// </summary>
     MatchSequence: TList<TZxcvbnMatch>;
 
-    /// <summary>
-    /// The password that was used to generate these results
-    /// </summary>
-    Password: String;
+	 /// <summary>
+	 /// The password that was used to generate these results
+	 /// </summary>
+	 Password: String;
 
-    /// <summary>
-    /// Warning on this password
-    /// </summary>
-    Warning: TZxcvbnWarning;
+	 /// <summary>
+	 /// Warning on this password
+	 /// </summary>
+	 Warning: TZxcvbnWarning;
 
-    /// <summary>
-    /// Suggestion on how to improve the password
-    /// </summary>
-    Suggestions: TZxcvbnSuggestions;
+	 /// <summary>
+	 /// Suggestion on how to improve the password
+	 /// </summary>
+	 Suggestions: TZxcvbnSuggestions;
 
-    /// <summary>
-    /// Constructor initialize Suggestion list.
-    /// </summary>
-    constructor Create;
-    destructor Destroy; override;
+	 /// <summary>
+	 /// Constructor initialize Suggestion list.
+	 /// </summary>
+	 constructor Create;
+	 destructor Destroy; override;
+
+	 /// <summary>Estimated guesses needed to crack password</summary>
+	 property Guesses: Real read get_Guesses;
+
+	 /// <summary>Order of magnitude of result.Guesses</summary>
+	 property GuessesLog10: Real read get_GuessesLog10;
   end;
 
 implementation
+
 uses
+  Math,
   Zxcvbn.DateMatcher,
   Zxcvbn.DictionaryMatcher,
   Zxcvbn.L33tMatcher,
   Zxcvbn.RegexMatcher,
   Zxcvbn.RepeatMatcher,
   Zxcvbn.SequenceMatcher,
-  Zxcvbn.SpatialMatcher;
+  Zxcvbn.SpatialMatcher,
+  Zxcvbn.PasswordScoring;
 
 { TZxcvbnResult }
 
@@ -298,15 +325,25 @@ begin
   inherited;
 end;
 
+function TZxcvbnResult.get_Guesses: Real;
+begin
+	Result := 0.5 * Math.Power(2, Self.Entropy);
+end;
+
+function TZxcvbnResult.get_GuessesLog10: Real;
+begin
+	Result := Math.Log10(Self.Guesses);
+end;
+
 { TZxcvbnMatch }
 
 function TZxcvbnMatch.Clone: TZxcvbnMatch;
 
   procedure CopyBaseProperties(const AFrom: TZxcvbnMatch; var ATo: TZxcvbnMatch);
   begin
-    ATo.Pattern := AFrom.Pattern;
-    ATo.Token := AFrom.Token;
-    ATo.Entropy := AFrom.Entropy;
+	 ATo.Pattern := AFrom.Pattern;
+	 ATo.Token := AFrom.Token;
+	 ATo.Entropy := AFrom.Entropy;
     ATo.Cardinality := AFrom.Cardinality;
     ATo.i := AFrom.i;
     ATo.j := AFrom.j;
