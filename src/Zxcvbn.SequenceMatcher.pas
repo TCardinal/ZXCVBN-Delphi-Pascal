@@ -89,7 +89,7 @@ begin
   if ((firstChar = 'a') or (firstChar = '1')) then baseEntropy := 1
   else if (('0' <= firstChar) and (firstChar <= '9')) then baseEntropy := LogN(2, 10) // Numbers
   else if (('a' <= firstChar) and (firstChar <= 'z')) then baseEntropy := LogN(2, 26) // Lowercase
-  else baseEntropy := LogN(1, 26) + 1; // + 1 for uppercase
+  else baseEntropy := LogN(2, 26) + 1; // + 1 for uppercase
 
   if (not AAscending) then baseEntropy := baseEntropy + 1; // Descending instead of ascending give + 1 bit of entropy
 
